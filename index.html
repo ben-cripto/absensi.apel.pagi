@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Hadir Apel Pagi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); 
+            min-height: 100vh; 
+            color: #000000; 
+        }
+
+        form {
+            margin-bottom: 20px;
+            background-image: url('DISDIKBUD.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: transparent; /* Dibuat transparan agar latar gambar terlihat */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgb(0, 0, 0); 
+            color: #000000; /* Warna font hitam untuk kontras dengan latar gambar */
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #000000; /* Warna font hitam */
+        }
+
+        input, select {
+            width: 100%; /* Diubah ke 100% untuk responsivitas di HP */
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box; 
+            border: 1px solid #fafafa00;
+            border-radius: 4px;
+            color: #000000; /* Warna font hitam di input */
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: rgb(247, 243, 243);
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%; /* Tombol penuh lebar di HP */
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%; /* Diubah ke 100% untuk responsivitas */
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: rgba(215, 241, 255, 0.9); 
+            border-radius: 8px;
+            overflow-x: auto; /* Tambahkan scroll horizontal untuk tabel di HP */
+            box-shadow: 0 4px 8px rgba(214, 207, 207, 0.1); 
+            display: block; /* Membuat tabel scrollable */
+        }
+
+        th, td {
+            border: 1px solid #000000;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap; /* Mencegah teks wrap di sel tabel */
+        }
+
+        th {
+            background-color: rgba(215, 241, 255, 0.9);
+            font-weight: bold;
+        }
+
+        /* Membuat kolom Nama, Tanggal, dan Status transparan di tabel slide2 */
+        #attendanceTable th:nth-child(1),
+        #attendanceTable th:nth-child(2),
+        #attendanceTable th:nth-child(3),
+        #attendanceTable td:nth-child(1),
+        #attendanceTable td:nth-child(2),
+        #attendanceTable td:nth-child(3) {
+            background-color: transparent;
+        }
+
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 4px;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+
+        .slide {
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        #loginForm {
+            display: none;
+            background-color: rgb(175, 209, 255);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%; /* Responsif, maksimal 90% lebar layar */
+            max-width: 300px;
+            margin: 100px auto;
+        }
+
+        #logoutBtn {
+            margin-top: 20px;
+            background-color: #f44336;
+            width: 100%; /* Tombol penuh lebar */
+        }
+
+        #logoutBtn:hover {
+            background-color: #da190b;
+        }
+
+        .reason-fields {
+            display: none;
+        }
+
+        /* Media queries untuk HP (layar kecil) */
+        @media (max-width: 768px) {
+            body {
+                margin: 10px; /* Margin lebih kecil di HP */
+            }
+
+            form {
+                padding: 15px; /* Padding lebih kecil */
+            }
+
+            table {
+                font-size: 14px; /* Font lebih kecil untuk tabel */
+            }
+
+            th, td {
+                padding: 6px; /* Padding lebih kecil */
+            }
+
+            img {
+                max-width: 80px; /* Gambar lebih kecil di HP */
+                max-height: 80px;
+            }
+
+            button {
+                padding: 12px 15px; /* Padding tombol lebih besar untuk kemudahan klik */
+            }
+
+            #loginForm {
+                width: 95%; /* Lebih lebar di HP */
+                margin: 50px auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1, h2 {
+                font-size: 1.5em; /* Judul lebih kecil di HP kecil */
+            }
+
+            label {
+                font-size: 14px; /* Label lebih kecil */
+            }
+
+            input, select {
+                font-size: 16px; /* Font input lebih besar untuk menghindari zoom di iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+   
+    <div id="slide1" class="slide active">
+        <h1>Silakan mengisi data hadir di bawah ini</h1>
+
+        <form id="attendanceForm">
+            <label for="name">Nama:</label>
+            <input type="text" id="name" required><br>
+            
+            <label for="date">Tanggal:</label>
+            <input type="date" id="date" required><br>
+
+            <label for="status">Status:</label>
+            <select id="status" required>
+                <option value="Hadir">Hadir</option>
+                <option value="Tidak Hadir">Tidak Hadir</option>
+                <option value="Berhalangan">Berhalangan apel</option>
+            </select><br>
+
+            <div class="reason-fields" id="reasonFields">
+                <label for="reason">Alasan (jika tidak hadir):</label>
+                <select id="reason">
+                    <option value="">Pilih alasan</option>
+                    <option value="Sakit">Sakit</option>
+                    <option value="Izin">Izin</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select><br>
+
+                <input type="text" id="otherReason" placeholder="Masukkan alasan lainnya" style="display: none; width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;"><br>
+            </div>
+
+            <label for="document">Dokumen (max 5MB, opsional):</label>
+            <input type="file" id="document" accept="image/*"><br>
+
+            <button type="submit">Tambah Data</button>
+        </form>
+
+        <button id="toSlide2Btn">Lihat Data Kehadiran (hanya admin yang dapat mengakses)</button>
+    </div>
+
+    <div id="slide2" class="slide">
+        <h2>Data Kehadiran</h2>
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Tanggal</th>
+                    <th>Status</th>
+                    <th>Alasan</th>
+                    <th>Dokumen</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceBody">
+            </tbody>
+        </table>
+
+        <button id="toSlide1Btn">Kembali ke Form Input</button>
+        <button id="logoutBtn">Logout Admin</button>
+    </div>
+
+    <div id="loginForm">
+        <h2>Login Admin untuk Melihat Data</h2>
+        <label for="username">Username:</label>
+        <input type="text" id="username" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br>
+        <button id="loginBtn">Login</button>
+        <p id="loginError" style="color: red; display: none;">Username atau password salah!</p>
+        <button id="cancelLoginBtn">Batal</button>
+    </div>
+
+    <script>
+        
+        const ADMIN_USERNAME = 'subbag umum';
+        const ADMIN_PASSWORD = 'umum 123';
+
+        let attendanceData = JSON.parse(localStorage.getItem('attendanceData')) || [];
+
+        const slide1 = document.getElementById('slide1');
+        const slide2 = document.getElementById('slide2');
+        const loginForm = document.getElementById('loginForm');
+        const toSlide2Btn = document.getElementById('toSlide2Btn');
+        const toSlide1Btn = document.getElementById('toSlide1Btn');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const cancelLoginBtn = document.getElementById('cancelLoginBtn');
+        const loginError = document.getElementById('loginError');
+        const statusSelect = document.getElementById('status');
+        const reasonFields = document.getElementById('reasonFields');
+        const reasonSelect = document.getElementById('reason');
+        const otherReasonInput = document.getElementById('otherReason');
+        const form = document.getElementById('attendanceForm');
+        const tableBody = document.getElementById('attendanceBody');
+
+        // Check if admin is logged in on page load
+        if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+            showSlide2();
+        } else {
+            showSlide1();
+        }
+
+        // Event listeners
+        toSlide2Btn.addEventListener('click', function() {
+            if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+                showSlide2();
+            } else {
+                showLoginForm();
+            }
+        });
+
+        toSlide1Btn.addEventListener('click', function() {
+            showSlide1();
+        });
+
+        loginBtn.addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                showSlide2();
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+
+        cancelLoginBtn.addEventListener('click', function() {
+            showSlide1();
+        });
+
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('isAdminLoggedIn');
+            showSlide1();
+        });
+
+        // Toggle reason fields based on status
+        statusSelect.addEventListener('change', function() {
+            if (this.value === 'Hadir') {
+                reasonFields.style.display = 'none';
+                reasonSelect.value = '';
+                otherReasonInput.style.display = 'none';
+                otherReasonInput.value = '';
+            } else {
+                reasonFields.style.display = 'block';
+            }
+        });
+
+        // Toggle other reason input
+        reasonSelect.addEventListener('change', function() {
+            if (this.value === 'Lainnya') {
+                otherReasonInput.style.display = 'block';
+            } else {
+                otherReasonInput.style.display = 'none';
+                otherReasonInput.value = '';
+            }
+        });
+
+        // Form submit handler
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('date').value;
+            const status = statusSelect.value;
+            const reason = reasonSelect.value === 'Lainnya' ? otherReasonInput.value : reasonSelect.value;
+            const documentInput = document.getElementById('document');
+
+            let documentData = null;
+            if (documentInput.files[0]) {
+                const file = documentInput.files[0];
+                if (file.size > 5 * 1024 * 1024) { 
+                    alert('Dokumen terlalu besar! Maksimal 5MB.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    documentData = event.target.result; 
+                    saveData(name, date, status, reason, documentData);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                saveData(name, date, status, reason, documentData);
+            }
+        });
+
+        function saveData(name, date, status, reason, documentData) {
+            attendanceData.push({ name, date, status, reason, document: documentData });
+            localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+            renderTable();
+            form.reset();
+            reasonFields.style.display = 'none'; // Reset display
+            otherReasonInput.style.display = 'none';
+        }
+
+        function renderTable() {
+            tableBody.innerHTML = '';
+            attendanceData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.date}</td>
+                    <td>${item.status}</td>
+                    <td>${item.reason || '-'}</td>
+                    <td>${item.document ? `<img src="${item.document}" alt="Dokumen">` : '-'}</td>
+                    <td><button class="delete-btn" onclick="deleteEntry(${index})">Hapus</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteEntry(index) {
+            attendanceData.splice(index, 1);
+            localStorage.setItem('attendanceData', JSON.stringify(attendanceData));
+            renderTable();
+        }
+
+        window.deleteEntry = deleteEntry;
+
+        function showSlide1() {
+            slide1.classList.add('active');
+            slide2.classList.remove('active');
+            loginForm.style.display = 'none';
+        }
+
+        function showSlide2() {
+            slide1.classList.remove('active');
+            slide2.classList.add('active');
+            loginForm.style.display = 'none';
+            renderTable();
+        }
+
+        function showLoginForm() {
+            loginForm.style.display = 'block';
+            slide1.classList.remove('active');
+            slide2.classList.remove('active');
+            loginError.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

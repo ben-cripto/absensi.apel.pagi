@@ -255,6 +255,7 @@
         <th>Status</th>
         <th>Alasan</th>
         <th>Dokumen</th>
+        <th>Jam Absen</th>
         <th>Aksi</th>
       </tr>
     </thead>
@@ -269,7 +270,6 @@
   function isAttendanceTimeValid() {
     const now = new Date();
 
-    // WIB (Indonesia)
     const hours = now.getHours();
     const minutes = now.getMinutes();
 
@@ -280,7 +280,6 @@
     return currentMinutes >= startTime && currentMinutes <= endTime;
   }
 </script>
-
 
 <!-- ========== SCRIPT UI ========== -->
 <script>
@@ -335,10 +334,11 @@
   form.onsubmit = e => {
   e.preventDefault();
 
-  if (!isAttendanceTimeValid()) {
-    alert("❌ Absen hanya bisa dilakukan pukul 07:30 - 07:50 WIB");
-    return;
-  }
+if (!isAttendanceTimeValid()) {
+  alert("Absen hanya bisa dilakukan pukul 07:30 – 07:50 WITA");
+  return;
+}
+
 
   const reason = reasonSelect.value === 'Lainnya' ? otherReason.value : reasonSelect.value;
   const file = document.getElementById('document').files[0];
@@ -362,7 +362,7 @@
 <!-- ========== FIREBASE ========== -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyACw9VUL4lUuoQCk2N3x4yJbFBoIRI7NQA",
@@ -378,28 +378,39 @@
   const colRef = collection(db, 'attendance');
 
   window.saveDataFirebase = async (name, date, status, reason, document) => {
-    await addDoc(colRef, { name, date, status, reason, document, createdAt: new Date() });
+    await addDoc(colRef, { name, date, status, reason, document,   createdAt: serverTimestamp() });
     alert('Data berhasil disimpan');
     loadDataFirebase();
   };
 
   window.loadDataFirebase = async () => {
-    const body = document.getElementById('attendanceBody');
-    body.innerHTML = '';
-    const snap = await getDocs(colRef);
-    snap.forEach(d => {
-      const x = d.data();
-      body.innerHTML += `
-        <tr>
-          <td>${x.name}</td>
-          <td>${x.date}</td>
-          <td>${x.status}</td>
-          <td>${x.reason || '-'}</td>
-          <td>${x.document ? `<img src="${x.document}">` : '-'}</td>
-          <td><button onclick="deleteDataFirebase('${d.id}')">Hapus</button></td>
-        </tr>`;
-    });
-  };
+  const body = document.getElementById('attendanceBody');
+  body.innerHTML = '';
+
+  const snap = await getDocs(colRef);
+
+  snap.forEach(d => {
+    const x = d.data();
+
+    const time = x.createdAt
+      ? new Date(x.createdAt.seconds * 1000).toLocaleTimeString('id-ID')
+      : '-';
+
+    body.innerHTML += `
+      <tr>
+        <td>${x.name}</td>
+        <td>${x.date}</td>
+        <td>${x.status}</td>
+        <td>${x.reason || '-'}</td>
+        <td>${x.document ? `<img src="${x.document}">` : '-'}</td>
+        <td>${time}</td>
+        <td>
+          <button onclick="deleteDataFirebase('${d.id}')">Hapus</button>
+        </td>
+      </tr>
+    `;
+  });
+};
 
   window.deleteDataFirebase = async id => {
     await deleteDoc(doc(db, 'attendance', id));

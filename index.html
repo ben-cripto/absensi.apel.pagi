@@ -264,6 +264,24 @@
   <button id="logoutBtn">Logout</button>
 </div>
 
+
+<script>
+  function isAttendanceTimeValid() {
+    const now = new Date();
+
+    // WIB (Indonesia)
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    const currentMinutes = hours * 60 + minutes;
+    const startTime = 7 * 60 + 30; // 07:30
+    const endTime   = 7 * 60 + 50; // 07:50
+
+    return currentMinutes >= startTime && currentMinutes <= endTime;
+  }
+</script>
+
+
 <!-- ========== SCRIPT UI ========== -->
 <script>
   const ADMIN_USERNAME = 'subbag umum';
@@ -315,22 +333,30 @@
   };
 
   form.onsubmit = e => {
-    e.preventDefault();
-    const reason = reasonSelect.value === 'Lainnya' ? otherReason.value : reasonSelect.value;
-    const file = document.getElementById('document').files[0];
+  e.preventDefault();
 
-    if (file) {
-      const r = new FileReader();
-      r.onload = () => saveDataFirebase(nameInput.value, dateInput.value, statusSelect.value, reason, r.result);
-      r.readAsDataURL(file);
-    } else {
-      saveDataFirebase(nameInput.value, dateInput.value, statusSelect.value, reason, null);
-    }
+  if (!isAttendanceTimeValid()) {
+    alert("❌ Absen hanya bisa dilakukan pukul 07:30 - 07:50 WIB");
+    return;
+  }
 
-    form.reset();
-    reasonFields.style.display = 'none';
-    otherReason.style.display = 'none';
-  };
+  const reason = reasonSelect.value === 'Lainnya' ? otherReason.value : reasonSelect.value;
+  const file = document.getElementById('document').files[0];
+
+  if (file) {
+    const r = new FileReader();
+    r.onload = () =>
+      saveDataFirebase(nameInput.value, dateInput.value, statusSelect.value, reason, r.result);
+    r.readAsDataURL(file);
+  } else {
+    saveDataFirebase(nameInput.value, dateInput.value, statusSelect.value, reason, null);
+  }
+
+  form.reset();
+  reasonFields.style.display = 'none';
+  otherReason.style.display = 'none';
+};
+
 </script>
 
 <!-- ========== FIREBASE ========== -->
